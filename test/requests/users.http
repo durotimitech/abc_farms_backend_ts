@@ -1,0 +1,30 @@
+# REGISTER
+POST http://localhost:9004/api/users/register
+Content-Type: application/json
+
+{
+    "email":"user@gmail.com",
+    "firstname":"test",
+    "lastname":"test",
+    "telephone":"12345678901",
+    "password":"12345678"
+}
+
+### LOGIN
+POST http://localhost:9004/api/users/login
+Content-Type: application/json 
+
+{
+ "email":"admin@gmail.com",
+ "password":"12345678"
+}
+
+### GET Users
+GET http://localhost:9004/api/users
+Content-Type: application/json 
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInVzZXJfaWQiOjE0LCJmaXJzdG5hbWUiOiJ0ZXN0IiwibGFzdG5hbWUiOiJ0ZXN0Iiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjg1NTIyMjg1fQ.07pbSB6RWQquiFaXFYjZKnWZKWx4S5gu4mp9LTqlH1U
+
+### GET admins
+GET http://localhost:9004/api/users/admins
+Content-Type: application/json 
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInVzZXJfaWQiOjE0LCJmaXJzdG5hbWUiOiJ0ZXN0IiwibGFzdG5hbWUiOiJ0ZXN0Iiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjg1NTIyMjg1fQ.07pbSB6RWQquiFaXFYjZKnWZKWx4S5gu4mp9LTqlH1U

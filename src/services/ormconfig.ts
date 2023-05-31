@@ -1,5 +1,5 @@
 import { DataSourceOptions } from "typeorm";
-import { AuthToken, User } from "../api/entities";
+import { AuthToken, User, Product, WishList } from "../api/entities";
 
 export const config: DataSourceOptions = {
   type: "mysql",
@@ -8,7 +8,7 @@ export const config: DataSourceOptions = {
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: [User, AuthToken],
+  entities: [User, AuthToken, Product, WishList],
   migrations: ["dist/src/api/migrations/**/*.js", "src/api/migrations/**/*.ts"],
   logging: true,
   synchronize: true,

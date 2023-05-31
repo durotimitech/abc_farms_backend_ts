@@ -3,11 +3,12 @@ import { dataSource } from "../../services/database";
 import { BadRequestError, ConflictError } from "../../utilities/errors";
 import logger from "../../utilities/logger";
 import { _response } from "../../utilities/responseHandler";
-import { changePasswordSchema, forgotPasswordSchema, loginSchema, registerSchema } from "../../utilities/validation/users";
+import { adminUpdateUserSchema, changePasswordSchema, forgotPasswordSchema, loginSchema, registerSchema } from "../../utilities/validation/users";
 import jwt from "jsonwebtoken";
 import {
   User as UserEntity,
-  AuthToken as AuthTokenEntity,
+  AuthToken as AuthTokenEntity,WishList as WishlistEntity,
+  UserRoleTypes,
 } from "../entities";
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
@@ -16,6 +17,7 @@ export const createUser = async (req: Request, res: Response) => {
   logger.info("Initiating register process");
 
   const User = dataSource.getRepository(UserEntity);
+  const Wishlist = dataSource.getRepository(WishlistEntity);
 
   const validate = registerSchema.validate(req.body);
 
@@ -39,13 +41,17 @@ export const createUser = async (req: Request, res: Response) => {
 
   const hashedPass = await bcrypt.hash(password, 10);
 
-  await User.create({
+  const new_user = await User.create({
     email,
     firstname,
     lastname,
     telephone,
     password: hashedPass,
   }).save();
+
+  await Wishlist.create({
+    user_id: new_user.id
+  }).save()
 
   return _response(res, StatusCodes.CREATED, {});
 };
@@ -187,86 +193,47 @@ export const changePassword = async (req: any, res: Response) => {
   return _response(res, StatusCodes.CREATED);
 };
 
-// // (GET) retrieve all users
-// exports.getUsers = async (req, res, next) => {
-//   try {
-//     const users = await Queries.selectAllAndOrder({
-//       table: "users",
-//       orderBy: "createdAt",
-//       direction: "DESC",
-//     });
+export const getUsers = async (_: Request, res: Response) => {
+  logger.info("Initiating get users process");
 
-//     const result = {
-//       count: users.length,
-//     };
+  const User = dataSource.getRepository(UserEntity);
 
-//     _response({ statusCode: 200, res, result });
-//   } catch (e) {
-//     _response({ statusCode: 500, res, result: e });
-//   }
-// };
+  const users = await User.find({select:["id", "email", "firstname", "lastname"]});
 
-// // (GET) retrieve all administrators
-// exports.getAdmins = async (req, res, next) => {
-//   try {
-//     const users = await Queries.selectColumnsWith1Operator({
-//       table: "users",
-//       condition: "accessLevel >1",
-//       columns: ["userId", "email", "firstName", "lastName", "accessLevel"],
-//     });
+  return _response(res, StatusCodes.OK, users);
+};
 
-//     return _response({ statusCode: 200, res, result: users });
-//   } catch (e) {
-//     return _response({ statusCode: 500, res, result: e });
-//   }
-// };
+export const getAdmins = async (_: Request, res: Response) => {
+  logger.info("Initiating get admins process");
 
-// // (PATCH) Admins updates user
-// exports.adminUpdateUser = async (req, res, next) => {
-//   try {
-//     const data = {
-//       accessLevel: req.body.accessLevel,
-//       updatedAt: getDate(),
-//     };
+  const User = dataSource.getRepository(UserEntity);
 
-//     const user = (
-//       await Queries.selectAllWith1Condition({
-//         table: "users",
-//         condition: { email: req.body.email },
-//       })
-//     )[0];
+  const users = await User.find({ where: { role: UserRoleTypes.ADMIN }, select:["id", "email", "firstname", "lastname"] });
 
-//     if (!user)
-//       return _response({
-//         statusCode: 400,
-//         res,
-//         result: "Email not found!",
-//       });
+  return _response(res, StatusCodes.OK, users);
+};
 
-//     await Queries.updateOne({
-//       table: "users",
-//       data,
-//       condition: { email: req.body.email },
-//     });
+export const adminUpdateUser = async (req: Request, res: Response) => {
+  logger.info("Initiating admin update user process");
 
-//     return _response({ statusCode: 200, res, result: "success" });
-//   } catch (e) {
-//     return _response({ statusCode: 500, res, result: e });
-//   }
-// };
+  const User = dataSource.getRepository(UserEntity);
 
-// /*
-// CREATE TABLE users (
-//   `userId` INT NOT NULL AUTO_INCREMENT,
-//   `email` VARCHAR(45) NOT NULL,
-//   `firstName` VARCHAR(45) NOT NULL,
-//   `lastName` VARCHAR(45) NOT NULL,
-//   `password` VARCHAR(100) NOT NULL,
-//   `phone` VARCHAR(20) NOT NULL,
-//   `isEmailVerified` TINYINT(1) NOT NULL,
-//   `accessLevel` INT NOT NULL DEFAULT 1,
-//   `verificationCode` INT NOT NULL,
-//   `createdAt` DATETIME NOT NULL,
-//   `updatedAt` DATETIME NOT NULL,
-//   PRIMARY KEY (`userId`));
-// */
+  const validate = adminUpdateUserSchema.validate(req.body);
+
+  if (validate.error) {
+    throw new BadRequestError(validate.error.details[0].message);
+  }
+
+  const { email, role } = validate.value;
+
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    throw new BadRequestError("Invalid credentials");
+  }
+
+  user.role = role;
+  await user.save();
+
+  return _response(res, StatusCodes.OK);
+};

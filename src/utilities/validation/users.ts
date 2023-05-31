@@ -7,17 +7,22 @@ export const registerSchema = Joi.object({
     telephone: Joi.string().required(),
     password: Joi.string().trim().required(),
   });
-
+  
   export const loginSchema = Joi.object({
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().trim().required(),
   });
-
+  
   export const forgotPasswordSchema = Joi.object({
     email: Joi.string().email().lowercase().required(),
   });
-
+  
   export const changePasswordSchema = Joi.object({
     old_password: Joi.string().trim().required(),
     new_password: Joi.string().trim().required(),
+  });
+  
+  export const adminUpdateUserSchema = Joi.object({
+    user_id: Joi.number().required(),
+    role: Joi.string().required(),
   });

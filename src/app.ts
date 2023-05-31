@@ -10,7 +10,7 @@ import logger from "./utilities/logger";
 import routeLogger from "./middlewares/routeLogger";
 import routesHandler from "./middlewares/routes";
 import authenticate from "./middlewares/authenticate";
-import isSalesman from "./middlewares/isAdmin";
+import isAdmin from "./middlewares/isAdmin";
 
 const app = express();
 
@@ -20,7 +20,7 @@ app.use(cors());
 
 app.use(routeLogger);
 app.use(authenticate);
-app.use(isSalesman);
+app.use(isAdmin);
 app.use(routesHandler);
 
 app.use((req, _) => {
@@ -44,3 +44,5 @@ app.listen(port, async () => {
     process.exit(1);
   }
 });
+
+export default app
