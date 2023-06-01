@@ -7,7 +7,7 @@
     "start": "nodemon --exec ts-node src/app.ts",
     "build": "tsc",
     "test": "mocha --recursive --exit --timeout 15000000",
-    "github": "git add . && git commit -m \"Added products and wishlist endpoints\" && git push origin master"
+    "github": "git add . && git commit -m \"Added a few tests\" && git push origin master"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "@types/hapi__joi": "^17.1.9",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/mocha": "^10.0.1",
+    "@types/sinon": "^10.0.15",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
@@ -36,6 +37,7 @@
     "jsonwebtoken": "^9.0.0",
     "mocha": "^10.2.0",
     "mysql2": "^3.3.3",
+    "sinon": "^15.1.0",
     "supertest": "^6.3.3",
     "typeorm": "^0.3.16",
     "winston": "^3.9.0"
